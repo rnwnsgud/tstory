@@ -42,9 +42,18 @@ public class PostController {
     @GetMapping("/user/{pageOwnerId}/post")
     public String postList(@PathVariable Integer pageOwnerId,
                            Model model,
+                           Integer categoryId,
                            @PageableDefault(size = 3) Pageable pageable) {
 
-        PostRespDto postRespDto = postService.getPostList(pageOwnerId, pageable);
+        PostRespDto postRespDto = null;
+
+        if (categoryId == null) {
+            postRespDto = postService.getPostList(pageOwnerId, pageable);
+        } else {
+            postRespDto = postService.getPostWithCategory(pageOwnerId, pageable, categoryId);
+        }
+
+
         model.addAttribute("postRespDto", postRespDto);
         return "/post/list";
     }

@@ -76,6 +76,34 @@ public class PostService {
 
     }
 
+    public PostRespDto getPostWithCategory(Integer pageOwnerId, Pageable pageable, Integer categoryId) {
+
+        Page<Post> postEntities = postRepository.findByUserIdAndCategoryId(pageOwnerId, categoryId, pageable);
+        List<Category> categoryEntities = categoryRepository.findByUserId(pageOwnerId);
+
+        List<Integer> pageNumbers = new ArrayList<>();
+        for (int i = 0; i < postEntities.getTotalPages(); i++) {
+            pageNumbers.add(i);
+        }
+
+        // 방문자 카운트 증가
+        Visit visitEntity = visitIncrease(pageOwnerId);
+
+        //getNumber() : 현재 페이지
+        PostRespDto postRespDto = new PostRespDto(
+                postEntities,
+                categoryEntities,
+                pageOwnerId,
+                postEntities.getNumber() - 1,
+                postEntities.getNumber() + 1,
+                pageNumbers,
+                visitEntity.getTotalCount()
+        );
+
+        return postRespDto;
+
+    }
+
     public void sendPost(PostReqDto postReqDto, User principal) {
 
         // 1. UUID로 파일쓰고 경로 리턴 받기
